@@ -97,20 +97,24 @@ class Banner {
             }
         } else {
             $i = 0;
-
+            $countNotAvailable = 0;
             $available = self::getAvailable();
+
             while ($i < count($banners)) {
-                if ($available[$i] == 1) {
-                    $reset = false;
-                    break;
+                if ($available[$i] == 0) {
+                    $countNotAvailable++;
                 }
                 $i++;
             }
+            $reset = ($countNotAvailable == count($banners) - 1) ? true : false;
         }
+
+        var_dump(count($banners));
+        var_dump($reset);
         if ($reset) {
             for ($i = 0; $i < count($banners); $i++) {
-                self::resetShow($id);
-                self::setAvailable($id);
+                self::resetShow($banners[$i]['id']);
+                self::setAvailable($banners[$i]['id']);
             }
         }
     }
@@ -173,14 +177,14 @@ class Banner {
          * Наличие одинаковых банеров на странице
          */
         while (!$show) {
-           // if (self::checkAvialable($banners[$index]['id'])) {
-                if (self::checkVisible($banners[$index]['id'])) {
-                    $show = true;
-                    // self::checkAvialable($banners[$index]['id']); //проверка доступности
-                    self::updateShow($banners[$index]['id'], $banners); //увеличиваем число показов
-                    array_push(self::$visible, $banners[$index]['id']); //добавляем банер в список баннеров на странице
-                    return $banners[$index]['text'];
-              //  }
+            // if (self::checkAvialable($banners[$index]['id'])) {
+            if (self::checkVisible($banners[$index]['id'])) {
+                $show = true;
+                // self::checkAvialable($banners[$index]['id']); //проверка доступности
+                self::updateShow($banners[$index]['id'], $banners); //увеличиваем число показов
+                array_push(self::$visible, $banners[$index]['id']); //добавляем банер в список баннеров на странице
+                return $banners[$index]['text'];
+                //  }
             } else {
                 $index = self::checkPriority($priority, $banners); //выбираем новый банер
             }
