@@ -34,7 +34,7 @@ class Banner {
 
     private static function getAvailableById($id) {
         $result = self::$mysqli->query("SELECT `available` FROM banner where id ='" . $id . "'");
-        while ($row = mysqli_fetch_assoc($result)) {
+        while ($row = $result->fetch_assoc()) {
             $available = $row['available'];
         }
         return $available;
@@ -48,7 +48,7 @@ class Banner {
         $available = array();
         $result = self::$mysqli->query("SELECT `available` FROM banner ");
         $i = 0;
-        while ($row = mysqli_fetch_assoc($result)) {
+        while ($row = $result->fetch_assoc()) {
             $available[$i] = $row['available'];
             $i++;
         }
@@ -70,7 +70,7 @@ class Banner {
 
         $i = 0;
 
-        while ($row = mysqli_fetch_assoc($result)) {
+        while ($row = $result->fetch_assoc()) {
 
 
             $show[$i] = $row['show'];
