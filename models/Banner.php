@@ -4,20 +4,21 @@ class Banner {
 
     private static $visible = array();
     private static $countBanners;
+    private static $mysqli;
 
     /*
      * Получаем список всех баннеров с БД
      */
-    public static function takeBanners($priority = 0) {
+
+    private static function takeBanners() {
 
         $banners = array();
 
-        $mysqli = mysqli_connect(HOST, USER, PASS, DB);
-        $result = mysqli_query($mysqli, "SELECT * FROM banner ");
-        mysqli_close($mysqli);
+        self::$mysqli = new mysqli(HOST, USER, PASS, DB);
+        $result = self::$mysqli->query("SELECT * FROM banner ");
         $i = 0;
 
-        while ($row = mysqli_fetch_assoc($result)) {
+        while ($row = $result->fetch_assoc()) {
             $banners[$i]['id'] = $row['id'];
             $banners[$i]['text'] = $row['text'];
             $banners[$i]['priority'] = $row['priority'];
@@ -30,13 +31,10 @@ class Banner {
     /*
      * Проверка баннера на доступноть к показу по ID
      */
-    public static function getAvailableById($id) {
-        $mysqli = mysqli_connect(HOST, USER, PASS, DB);
-        $result = mysqli_query($mysqli, "SELECT `available` FROM banner where id ='" . $id . "'");
-        mysqli_close($mysqli);
 
+    private static function getAvailableById($id) {
+        $result = self::$mysqli->query("SELECT `available` FROM banner where id ='" . $id . "'");
         while ($row = mysqli_fetch_assoc($result)) {
-
             $available = $row['available'];
         }
         return $available;
@@ -45,14 +43,11 @@ class Banner {
     /*
      * Получаем достпуность всех баннеров в БД
      */
-    public static function getAvailable() {
-        $mysqli = mysqli_connect(HOST, USER, PASS, DB);
+
+    private static function getAvailable() {
         $available = array();
-        $result = mysqli_query($mysqli, "SELECT `available` FROM banner ");
-
-        mysqli_close($mysqli);
+        $result = self::$mysqli->query("SELECT `available` FROM banner ");
         $i = 0;
-
         while ($row = mysqli_fetch_assoc($result)) {
             $available[$i] = $row['available'];
             $i++;
@@ -65,15 +60,14 @@ class Banner {
      * если ID указано то получаем один баннер,
      * в ином случае получаем все.
      */
-    public static function getShow($id = -1) {
-        $mysqli = mysqli_connect(HOST, USER, PASS, DB);
+
+    private static function getShow($id = -1) {
         if ($id < 0) {
-            $result = mysqli_query($mysqli, "SELECT `show` FROM banner ");
+            $result = self::$mysqli->query("SELECT `show` FROM banner ");
         } else {
-            $result = mysqli_query($mysqli, "SELECT `show` FROM banner where id ='" . $id . "'");
+            $result = self::$mysqli->query("SELECT `show` FROM banner where id ='" . $id . "'");
         }
 
-        mysqli_close($mysqli);
         $i = 0;
 
         while ($row = mysqli_fetch_assoc($result)) {
@@ -91,21 +85,19 @@ class Banner {
      * если указать "1" то баннер будет доступен,
      * если указать "0" то недоступен.
      */
-    public static function setAvailable($id, $bool = 1) {
-        $mysqli = mysqli_connect(HOST, USER, PASS, DB);
-        mysqli_query($mysqli, "UPDATE banner SET available='" . $bool . "' WHERE id=" . $id);
-        mysqli_close($mysqli);
+
+    private static function setAvailable($id, $bool = 1) {
+        self::$mysqli->query("UPDATE banner SET available='" . $bool . "' WHERE id=" . $id);
     }
 
     /*
      * Меняем количество показа баннера по ID
      */
-    public static function setShow($id, $value) {
-        $mysqli = mysqli_connect(HOST, USER, PASS, DB);
-        mysqli_query($mysqli, "UPDATE `banners`.`banner` "
+
+    private static function setShow($id, $value) {
+        self::$mysqli->query("UPDATE `banners`.`banner` "
                 . "SET `show` = '" . $value . "' "
                 . "WHERE `banner`.`id` = " . $id);
-        mysqli_close($mysqli);
     }
 
     /*
@@ -114,7 +106,8 @@ class Banner {
      * баннерных позиций на странице, то возвращаем false,
      * если их больше, то возвращаем true
      */
-    public static function countAvailable($countOnPage) {
+
+    private static function countAvailable($countOnPage) {
         $i = 0;
         $countAvailable = 0;
         $available = self::getAvailable();
@@ -130,7 +123,8 @@ class Banner {
     /*
      * Увеличиваем количество показов баннера в БД
      */
-    public static function updateShow($id, $banners) {
+
+    private static function updateShow($id, $banners) {
         $reset = false;
         /*
          * проверяем банер на доступность,
@@ -144,7 +138,7 @@ class Banner {
             if ($count >= $banners[$id - 1]['priority']) {
                 self::setAvailable($id, 0);
             }
-        } 
+        }
         /*
          * если банер недоступен,
          * пытаемся найти хоть один
@@ -165,7 +159,7 @@ class Banner {
             }
             $reset = ($countNotAvailable == self::$countBanners - 1) ? true : false;
         }
-       
+
         if ($reset) {
             for ($i = 0; $i < self::$countBanners; $i++) {
                 self::resetShow($banners[$i]['id']);
@@ -177,43 +171,46 @@ class Banner {
     /*
      * Обнуляем количество показов баннера на странице по ID
      */
-    public static function resetShow($id) {
-        $mysqli = mysqli_connect(HOST, USER, PASS, DB);
-        mysqli_query($mysqli, "UPDATE `banners`.`banner` "
+
+    private static function resetShow($id) {
+        self::$mysqli->query("UPDATE `banners`.`banner` "
                 . "SET `show` = '0' "
                 . "WHERE `banner`.`id` = " . $id);
-        mysqli_close($mysqli);
     }
 
     /*
      * Сверяем баннеры на приоритет, пока не найдем нужный.
      */
-    public static function checkPriority($priority, $banners) {
+
+    private static function checkPriority($priority, $banners) {
         $exit = false;
+        $countBanners = count($banners) - 1;
         while (!$exit) {
-            $index = rand(0, count($banners) - 1);
+            $index = rand(0, $countBanners);
             if ($banners[$index]['priority'] >= $priority) {
                 $exit = true;
             }
         }
         return $index;
     }
-    
+
     /*
      * Проверяем есть ли уже такой баннер на странице по ID
      */
-    public static function checkVisible($id) {
+
+    private static function checkVisible($id) {
         if (in_array($id, self::$visible)) {
             return false;
         } else {
             return true;
         }
     }
-    
+
     /*
      * Проверяем доступен ли баннер по ID
      */
-    public static function checkAvialable($id) {
+
+    private static function checkAvialable($id) {
         if (self::getAvailableById($id) == 1) {
             return true;
         } else {
@@ -224,8 +221,8 @@ class Banner {
     /*
      * Показываем баннер на странице
      */
+
     public static function showBanner($priority = 0) {
-        $text = array();
         $show = false;
         $banners = self::takeBanners();
         self::$countBanners = count($banners);
@@ -248,6 +245,7 @@ class Banner {
                     $show = true;
                     self::updateShow($banners[$index]['id'], $banners); //увеличиваем число показов
                     array_push(self::$visible, $banners[$index]['id']); //добавляем банер в список баннеров на странице
+                    self::$mysqli->close();
                     return $banners[$index]['text'];
                 } else {
                     $index = self::checkPriority($priority, $banners); //выбираем новый банер
@@ -258,6 +256,7 @@ class Banner {
                 if (self::checkAvialable($banners[$index]['id'])) {
                     self::updateShow($banners[$index]['id'], $banners); //увеличиваем число показов
                     array_push(self::$visible, $banners[$index]['id']); //добавляем банер в список баннеров на странице
+                    self::$mysqli->close();
                     return $banners[$index]['text'];
                 } else {
                     $index = self::checkPriority($priority, $banners);
