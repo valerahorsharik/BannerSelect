@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Хост: 127.0.0.1
--- Время создания: Июн 08 2016 г., 18:23
+-- Время создания: Июн 09 2016 г., 10:11
 -- Версия сервера: 5.6.17
 -- Версия PHP: 5.5.12
 
@@ -40,11 +40,11 @@ CREATE TABLE IF NOT EXISTS `banner` (
 --
 
 INSERT INTO `banner` (`id`, `text`, `priority`, `show`, `available`) VALUES
-(1, 'rek1 p1 id1', 3, 0, 1),
-(2, 'rek2 p3 id2', 3, 0, 1),
-(3, 'rek3 p5 id3', 5, 0, 1),
-(4, 'rek4 p2 id4', 2, 0, 1),
-(5, 'rek5 p2 id5', 2, 0, 1);
+(1, 'Banner1', 1, 0, 1),
+(2, 'Banner2', 3, 0, 1),
+(3, 'Banner3', 5, 0, 1),
+(4, 'Banner4', 2, 0, 1),
+(5, 'Banner5', 2, 0, 1);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
