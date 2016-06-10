@@ -157,7 +157,8 @@ class Banner {
                 }
                 $i++;
             }
-            $reset = ($countNotAvailable == self::$countBanners - 1) ? true : false;
+
+            $reset = ($countNotAvailable == self::$countBanners ) ? true : false;
         }
 
         if ($reset) {

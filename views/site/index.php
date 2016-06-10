@@ -1,6 +1,5 @@
 
 
-
-<div class="banner"><?= Banner::showBanner() ?></div>
-<div class="banner"><?= Banner::showBanner() ?></div>
-<div class="banner"><?= Banner::showBanner() ?></div>
+<?php foreach($banners as $banner):?>
+<div class="banner"><?= $banner  ?></div>
+<?php endforeach; ?>
