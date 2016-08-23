@@ -59,10 +59,11 @@ body {
  
   .banner{
       margin-top: 150px;
-      width: 250px;
-      height: 350px;
+      box-sizing:border-box;
+      width: 255px;
+      height: 355px;
       vertical-align: middle;
-    padding: 100px 35px;
+    padding: 0px;
       border-style: dashed;
       float:left;
       border-color:  red;
